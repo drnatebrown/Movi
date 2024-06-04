@@ -1,8 +1,8 @@
 # Movi ![GitHub](https://img.shields.io/github/license/mohsenzakeri/movi?color=green)
 
-Movi is a full text index for indexing large pangenomes. It is designed based on move data structure. Move structure is a data structure based on the Burrows Wheeler Transform (BWT) by Nishimoto and Tabei.
+Movi is a full text index for pangenomes. It takes advantage of the move data structure (by Nishimoto and Tabei). Movi works with genomic file formats. The high locality of the reference and latency hiding in Movi results in low and predictabile query latencies. These properties make Movi ideal for real time applications like Nanopore Adaptive sampling.
 
->[Zakeri, Mohsen, Brown, Nathaniel K., Ahmed, Omar Y., Gagie, Travis, and Langmead, Ben. "Movi: a fast and cache-efficient full-text pangenome index". bioRxiv preprint (2023)](https://www.biorxiv.org/content/10.1101/2023.11.04.565615v1)
+>[Zakeri, Mohsen, Brown, Nathaniel K., Ahmed, Omar Y., Gagie, Travis, and Langmead, Ben. "Movi: a fast and cache-efficient full-text pangenome index". bioRxiv preprint (2023)](https://www.biorxiv.org/content/10.1101/2023.11.04.565615v2)
 
 >Nishimoto, Takaaki, and Yasuo Tabei. "Optimal-time queries on BWT-runs compressed indexes." arXiv preprint arXiv:2006.05104 (2020).
 
@@ -70,11 +70,11 @@ The constant index will be located at `<index directory>/constant_index/movi_ind
 
 To compute PMLs using the **default** movi index, please run the following command on the fastq or fasta file of the reads:
 ```
-movi-default query <default index directory> <reads file>
+movi-default query --pml --index <default index directory> --read <reads file>
 ```
 or the following command for using the **constant** movi index:
 ```
-movi-constant query <constant index directory> <reads file>
+movi-constant query --pml --index <constant index directory> --read <reads file>
 ```
 
 `<reads file>` is the address of the fasta or fastq file containing the reads.
@@ -82,11 +82,12 @@ movi-constant query <constant index directory> <reads file>
 After the query command finishes, a file with the same name as the reads file and the extension `mpml.bin` is generated in the directory that also includes the reads file.
 Since this file is in the binary format, to view the PMLs please run the following command:
 ```
-movi-default view <mpml file> | less
+movi-default view --pml-file <mpml file> | less
 ```
 `<mpml file>` is the file generated in the query step.
 
+The output of the last command shows each read's name following by pseudo matching lengths computed for it. A pseudo matching length is outputed for every base of the read. This is the same as the output produced by SPUMONI.
 
 ### You can read more about Movi here:
-> [https://www.biorxiv.org/content/10.1101/2023.11.04.565615v1](https://www.biorxiv.org/content/10.1101/2023.11.04.565615v1)
+> [https://www.biorxiv.org/content/10.1101/2023.11.04.565615v2](https://www.biorxiv.org/content/10.1101/2023.11.04.565615v2)
 
