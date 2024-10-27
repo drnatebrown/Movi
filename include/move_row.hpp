@@ -20,6 +20,9 @@ const uint8_t mask_overflow_offset = static_cast<uint8_t>(~(((1U << 1) - 1) << 5
 const uint8_t mask_overflow_thresholds = static_cast<uint8_t>(~(((1U << 1) - 1) << 6));  // 01000000
 #define MAX_RUN_LENGTH 65535 // 2^16 - 1
 #endif
+#if MODE == 4
+const uint8_t mask_is_col_run = static_cast<uint8_t>(~(((1U << 1) - 1) << 7));  // 10000000
+#endif
 #if MODE == 3
 const uint16_t mask_id =  static_cast<uint16_t>(~(((1U << 4) - 1) << 12));                  // 11110000 00000000
 const uint16_t mask_offset =  static_cast<uint16_t>(~(((1U << 12) - 1) << 0));              // 00001111 11111111
@@ -67,6 +70,9 @@ class MoveRow{
         void set_threshold(uint16_t t) { threshold = t; }
 #endif
 #if MODE == 4
+        void set_is_col_run();
+        bool is_col_run() const;
+
         void set_col(uint8_t col_);
         uint8_t get_col() const;
 #endif
@@ -78,7 +84,7 @@ class MoveRow{
         void set_next_down(uint32_t i, uint16_t t) { next_down[i] = t; }
 #endif
         uint64_t row_size() {
-#if MODE == 0
+#if MODE == 0 or MODE == 4
             return 12;
 #endif
 #if MODE == 1
@@ -89,9 +95,6 @@ class MoveRow{
 #endif
 #if MODE == 3
             return 8;
-#endif
-#if MODE == 4
-            return 13;
 #endif
         }
     private:
@@ -110,9 +113,6 @@ class MoveRow{
         // to store pointers for avoiding scanning
         uint16_t next_up[3];
         uint16_t next_down[3];
-#endif
-#if MODE == 4
-        uint8_t col;
 #endif
 };
 
@@ -212,8 +212,13 @@ inline bool MoveRow::is_overflow_thresholds() const{
 #endif
 
 #if MODE == 4
+inline bool MoveRow::is_col_run() const {
+    uint8_t res = extract_value(overflow_bits, mask_is_col_run, 7);
+    return static_cast<bool>(res);
+}
+
 inline uint8_t MoveRow::get_col() const {
-    return col;
+    return n;
 }
 #endif
 

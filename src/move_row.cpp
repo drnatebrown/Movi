@@ -123,7 +123,13 @@ void MoveRow::set_c(char c_, std::vector<uint64_t>& alphamap) {
 }
 
 #if MODE == 4
+void MoveRow::set_is_col_run() {
+    overflow_bits = overflow_bits & mask_is_col_run;
+    overflow_bits = overflow_bits | (1 >> 7);
+}
+
 void MoveRow::set_col(uint8_t col_) {
-    col = col_;
+    set_is_col_run();
+    n = col_;
 }
 #endif

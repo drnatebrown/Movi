@@ -82,6 +82,9 @@ MoveStructure::MoveStructure(MoviOptions* movi_options_) {
     onebit = false;
     no_ftab = 0;
     all_initializations = 0;
+    #if MODE == 4
+    num_seqs = 0;
+    #endif
 }
 
 MoveStructure::MoveStructure(MoviOptions* movi_options_, bool onebit_, bool splitting_, bool constant_) {
@@ -112,6 +115,7 @@ MoveStructure::MoveStructure(MoviOptions* movi_options_, bool onebit_, bool spli
 #if MODE == 4
     std::string col_filename = movi_options->get_ref_file() + std::string(".movi_col_ids");
     read_cols(col_filename, cols);
+    num_seqs = movi_options->get_documents();
 #endif
     build();
 }
@@ -419,6 +423,14 @@ char MoveStructure::get_char(uint64_t idx) {
 uint64_t MoveStructure::get_n(uint64_t idx) {
 #if MODE == 3
     return rlbwt[idx].get_n();
+#endif
+#if MODE == 4
+    if (rlbwt[idx].is_col_run()) {
+        return num_seqs;
+    }
+    else {
+        return rlbwt[idx].get_n();
+    }
 #endif
     if (rlbwt[idx].is_overflow_n()) {
         return n_overflow[rlbwt[idx].get_n()];
@@ -946,7 +958,9 @@ void MoveStructure::build() {
         // bit1_after_eof = alphamap[bwt_string[i+1]];
 
         #if MODE == 4
-        rlbwt[r_idx].set_col(cols[r_idx]);
+        if (cols[r_idx] > 0) {
+            rlbwt[r_idx].set_col(cols[r_idx]);
+        }
         #endif
     }
     std::cerr << "All the move rows are built.\n";
@@ -1071,7 +1085,7 @@ void MoveStructure::build() {
     for (uint64_t i = 0; i < counts.size(); i++) {
         uint64_t last_run = last_runs.back();
         uint64_t last_offset = last_offsets.back();
-        if (last_offset + 1 >= rlbwt[last_run].get_n()) {
+        if (last_offset + 1 >= get_n(last_run)) {
             first_runs.push_back(last_run + 1);
             first_offsets.push_back(0);
         } else {
@@ -1401,7 +1415,7 @@ void MoveStructure::update_interval(MoveInterval& interval, char next_char) {
     }
     while (interval.run_end >= interval.run_start and get_char(interval.run_end) != next_char) { //  >= or >
         interval.run_end -= 1;
-        interval.offset_end = rlbwt[interval.run_end].get_n() - 1;
+        interval.offset_end = get_n(interval.run_end) - 1;
         if (interval.run_end == 0) {
             break;
         }
@@ -1443,7 +1457,7 @@ void MoveStructure::update_interval(MoveInterval& interval, char next_char) {
         } else {
             uint64_t run_end_ = interval.run_end - rlbwt[interval.run_end].get_next_up(alphabet_index);
             interval.run_end = run_end_;
-            interval.offset_end = rlbwt[interval.run_end].get_n() - 1;
+            interval.offset_end = get_n(interval.run_end) - 1;
         }
     }
 #endif
@@ -2155,9 +2169,9 @@ uint64_t MoveStructure::backward_search(std::string& R, int32_t& pos_on_r) {
             if (run_start_prev == run_end_prev) {
                 match_count = offset_end_prev - offset_start_prev + 1;
             } else {
-                match_count = (rlbwt[run_start_prev].get_n() - offset_start_prev) + (offset_end_prev + 1);
+                match_count = (get_n(run_start_prev) - offset_start_prev) + (offset_end_prev + 1);
                 for (uint64_t k = run_start_prev + 1; k < run_end_prev; k ++) {
-                    match_count += rlbwt[k].get_n();
+                    match_count += get_n(k);
                 }
             }
             // pos_on_r -= 1;
@@ -2177,7 +2191,7 @@ uint64_t MoveStructure::backward_search(std::string& R, int32_t& pos_on_r) {
         }
         while ((run_end > run_start) and alphabet[rlbwt[run_end].get_c()] != R[pos_on_r]) {
             run_end -= 1;
-            offset_end = rlbwt[run_end].get_n() - 1;
+            offset_end = get_n(run_end) - 1;
             if (run_end == 0) {
                 break;
             }
@@ -2222,7 +2236,7 @@ uint64_t MoveStructure::backward_search(std::string& R, int32_t& pos_on_r) {
                 } else {
                     run_end = run_start;
                 }
-                offset_end = rlbwt[run_end].get_n() - 1;
+                offset_end = get_n(run_end) - 1;
             }
         }
 #endif
@@ -2237,9 +2251,9 @@ uint64_t MoveStructure::backward_search(std::string& R, int32_t& pos_on_r) {
                 if (run_start == run_end) {
                     match_count = offset_end - offset_start + 1;
                 } else {
-                    match_count = (rlbwt[run_start].get_n() - offset_start) + (offset_end + 1);
+                    match_count = (get_n(run_start) - offset_start) + (offset_end + 1);
                     for (uint64_t k = run_start + 1; k < run_end; k ++) {
-                        match_count += rlbwt[k].get_n();
+                        match_count += get_n(k);
                     }
                 }
                 // pos_on_r -= 1;
@@ -2253,9 +2267,9 @@ uint64_t MoveStructure::backward_search(std::string& R, int32_t& pos_on_r) {
             if (run_start_prev == run_end_prev) {
                 match_count = offset_end_prev - offset_start_prev + 1;
             } else {
-                match_count = (rlbwt[run_start_prev].get_n() - offset_start_prev) + (offset_end_prev + 1);
+                match_count = (get_n(run_start_prev) - offset_start_prev) + (offset_end_prev + 1);
                 for (uint64_t k = run_start_prev + 1; k < run_end_prev; k ++) {
-                    match_count += rlbwt[k].get_n();
+                    match_count += get_n(k);
                 }
             }
             // pos_on_r -= 1;
@@ -2788,7 +2802,7 @@ void MoveStructure::verify_lfs() {
             if (i != end_bwt_idx) {
                 lf = LF(j);
             } else {
-                std::cerr << "end_run = " << i << " len: " << rlbwt[i].get_n () << "\n";
+                std::cerr << "end_run = " << i << " len: " << get_n(i) << "\n";
             }
             LF_move(offset_, idx_);
             uint64_t lf_move = all_p[idx_] + offset_;
@@ -2800,7 +2814,7 @@ void MoveStructure::verify_lfs() {
                 std::cerr << "rlbwt[idx].get_id\t" << get_id(i) << "\n";
                 std::cerr << "get_offset(i)\t" << get_offset(i) << "\n";
                 for (uint64_t k = 0; k <= i; k++) {
-                    std::cerr << rlbwt[k].get_n() << " ";
+                    std::cerr << get_n(k) << " ";
                 }
                 std::cerr << "\n\n";
 

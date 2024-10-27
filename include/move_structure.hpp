@@ -228,6 +228,10 @@ class MoveStructure {
         uint64_t r;
         uint64_t original_r;
 
+        #if MODE == 4
+        uint64_t num_seqs;
+        #endif
+
         // The explicit values for the end bwt row
         uint64_t end_bwt_idx;
         uint64_t eof_row; // This pointer is the same as end_bwt_idx, should be removed.
