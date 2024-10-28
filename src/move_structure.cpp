@@ -110,7 +110,7 @@ MoveStructure::MoveStructure(MoviOptions* movi_options_, bool onebit_, bool spli
     read_thresholds(thr_filename, thresholds);
 #endif
 #if MODE == 4
-    std::string col_filename = movi_options->get_ref_file() + std::string(".movi_col_ids");
+    std::string col_filename = movi_options->get_ref_file() + std::string(".col_ids");
     read_cols(col_filename, cols);
 #endif
     build();
@@ -596,7 +596,7 @@ void MoveStructure::build() {
         std::cerr << "bits.size after loading the d_col file: " << bits.size() << "\n";
         std::cerr << "The main bit vector (bits) is loaded from the d_col file.\n";
         #elif MODE == 4
-        std::string splitting_filename = movi_options->get_ref_file() + std::string(".movi_col_runs");
+        std::string splitting_filename = movi_options->get_ref_file() + std::string(".col_runs.bv");
         std::ifstream splitting_file(splitting_filename);
 
         bits.load(splitting_file);
