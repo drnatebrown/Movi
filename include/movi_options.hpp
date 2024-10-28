@@ -10,7 +10,6 @@ class MoviOptions {
             mls_file = "";
             #if MODE == 4
             col_ids_file = "";
-            documents = 0;
             #endif
             index_dir = "";
             LF_type = "reconstruct";
@@ -44,7 +43,6 @@ class MoviOptions {
         std::string get_mls_file() { return mls_file; }
         #if MODE == 4
         std::string get_col_ids_file() { return col_ids_file; }
-        uint64_t get_documents() { return documents; }
         #endif
         std::string get_index_dir() { return index_dir; }
 
@@ -88,7 +86,6 @@ class MoviOptions {
         void set_mls_file(std::string file_address) { mls_file = file_address; }
         #if MODE == 4
         void set_col_ids_file(std::string file_address) { col_ids_file = file_address; }
-        void set_documents(uint64_t documents_) { documents = documents_; }
         #endif
         void set_index_dir(std::string dir) { index_dir = dir; }
 
@@ -100,7 +97,6 @@ class MoviOptions {
             std::cerr << "mls_file:\t" << mls_file << "\n";
             #if MODE == 4
             std::cerr << "col_ids_file:\t" << col_ids_file << "\n";
-            std::cerr << "documents:\t" << documents << "\n";
             #endif
             std::cerr << "index_dir:\t" << index_dir << "\n";
             std::cerr << "LF_type:\t" << LF_type << "\n";
@@ -125,7 +121,6 @@ class MoviOptions {
         std::string mls_file;
         #if MODE == 4
         std::string col_ids_file;
-        uint64_t documents;
         #endif
         std::string index_dir;
         std::string LF_type;

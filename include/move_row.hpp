@@ -22,6 +22,8 @@ const uint8_t mask_overflow_thresholds = static_cast<uint8_t>(~(((1U << 1) - 1) 
 #endif
 #if MODE == 4
 const uint8_t mask_is_col_run = static_cast<uint8_t>(~(((1U << 1) - 1) << 7));  // 10000000
+const uint16_t mask_cid = static_cast<uint8_t>(~(((1U << 8) - 1) << 0));      // 00000000 11111111
+const uint16_t mask_n = static_cast<uint8_t>(~(((1U << 8) - 1) << 8));        // 11111111 00000000
 #endif
 #if MODE == 3
 const uint16_t mask_id =  static_cast<uint16_t>(~(((1U << 4) - 1) << 12));                  // 11110000 00000000
@@ -130,8 +132,15 @@ inline uint16_t extract_value(uint16_t source, uint16_t mask, uint16_t shift) {
 #endif
 
 inline uint16_t MoveRow::get_n() const{
-#if MODE == 0 or MODE == 1 or MODE == 2 or MODE == 4
+#if MODE == 0 or MODE == 1 or MODE == 2
     return n;
+#endif
+#if MODE == 4
+    if (is_col_run()) {
+        return static_cast<uint16_t>(extract_value(n, mask_n, 8));
+    } else {
+        return n;
+    }
 #endif
 #if MODE == 3
     uint16_t res = static_cast<uint16_t>(extract_value(n, mask_n, 0));
@@ -218,7 +227,11 @@ inline bool MoveRow::is_col_run() const {
 }
 
 inline uint8_t MoveRow::get_col() const {
-    return n;
+    if (is_col_run()) {
+        return static_cast<uint8_t>(extract_value(n, mask_cid, 0));
+    } else {
+        return 0;
+    }
 }
 #endif
 

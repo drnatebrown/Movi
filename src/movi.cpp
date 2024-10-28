@@ -29,7 +29,7 @@ std::string program() {
     return "compact";
 #endif
 #if MODE == 4
-    return "split";
+    return "col-bwt";
 #endif
 }
 
@@ -72,8 +72,7 @@ bool parse_command(int argc, char** argv, MoviOptions& movi_options) {
         ("preprocessed", "The BWT is preprocessed into heads and lens files")
         ("verify", "Verify if all the LF_move operations are correct")
         ("ftab-k", "The length of the ftab kmer", cxxopts::value<uint32_t>())
-        ("multi-ftab", "Use ftabs with smaller k values if the largest one fails")
-        ("N,docs", "Number of documents for the index", cxxopts::value<uint32_t>());
+        ("multi-ftab", "Use ftabs with smaller k values if the largest one fails");
 
     auto queryOptions = options.add_options("query")
         ("pml", "Compute the pseudo-matching lengths (PMLs)")
@@ -151,15 +150,6 @@ bool parse_command(int argc, char** argv, MoviOptions& movi_options) {
                     if (result.count("preprocessed")) {
                         movi_options.set_preprocessed(true);
                     }
-                    #if MODE == 4
-                    if (result.count("docs") >= 1) {
-                        movi_options.set_documents(result["docs"].as<uint32_t>());
-                    }
-                    else {
-                        const std::string message = "Please specify the number of documents for the index.";
-                        cxxopts::throw_or_mimic<cxxopts::exceptions::invalid_option_format>(message);
-                    }
-                    #endif
                 } else {
                     const std::string message = "Please include one index directory and one fasta file.";
                     cxxopts::throw_or_mimic<cxxopts::exceptions::invalid_option_format>(message);
@@ -198,7 +188,7 @@ bool parse_command(int argc, char** argv, MoviOptions& movi_options) {
                         // Set global verbose flag
                         movi_options.set_stdout(true);
                         #if MODE == 4
-                        std::cerr << "stdout is not supported for split mode for Col IDs.\n";
+                        std::cerr << "stdout is not supported for col-BWT mode with Col IDs.\n";
                         #endif
                     }
                 } else {
