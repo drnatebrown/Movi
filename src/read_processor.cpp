@@ -185,19 +185,35 @@ void ReadProcessor::write_mls(Strand& process) {
         std::cout << "\n";
     } else {
         #if MODE == 4
-        mls_file.write(reinterpret_cast<char*>(&process.st_length), sizeof(process.st_length));
-        mls_file.write(reinterpret_cast<char*>(&process.read_name[0]), process.st_length);
-        auto& ml_lens = process.mq.get_matching_lengths();
-        uint64_t mq_lens_size = ml_lens.size();
-        mls_file.write(reinterpret_cast<char*>(&mq_lens_size), sizeof(mq_lens_size));
-        mls_file.write(reinterpret_cast<char*>(&ml_lens[0]), mq_lens_size * sizeof(ml_lens[0]));
+        mls_file << ">" << process.read_name << " \n";
+        auto& matching_lens = process.mq.get_matching_lengths();
+        uint64_t mq_lens_size = matching_lens.size();
+        for (int64_t i = mq_lens_size - 1; i >= 0; i--) {
+            mls_file << matching_lens[i] << " ";
+        }
+        mls_file << "\n";
 
-        col_ids_file.write(reinterpret_cast<char*>(&process.st_length), sizeof(process.st_length));
-        col_ids_file.write(reinterpret_cast<char*>(&process.read_name[0]), process.st_length);
-        auto& col_ids = process.mq.get_col_ids();
-        uint64_t col_ids_size = col_ids.size();
-        col_ids_file.write(reinterpret_cast<char*>(&col_ids_size), sizeof(col_ids_size));
-        col_ids_file.write(reinterpret_cast<char*>(&col_ids[0]), col_ids_size * sizeof(col_ids[0]));
+        col_ids_file << ">" << process.read_name << " \n";
+        auto& matching_ids = process.mq.get_col_ids();
+        uint64_t mq_ids_size = matching_ids.size();
+        for (int64_t i = mq_ids_size - 1; i >= 0; i--) {
+            col_ids_file << matching_ids[i] << " ";
+        }
+        col_ids_file << "\n";
+
+        // mls_file.write(reinterpret_cast<char*>(&process.st_length), sizeof(process.st_length));
+        // mls_file.write(reinterpret_cast<char*>(&process.read_name[0]), process.st_length);
+        // auto& ml_lens = process.mq.get_matching_lengths();
+        // uint64_t mq_lens_size = ml_lens.size();
+        // mls_file.write(reinterpret_cast<char*>(&mq_lens_size), sizeof(mq_lens_size));
+        // mls_file.write(reinterpret_cast<char*>(&ml_lens[0]), mq_lens_size * sizeof(ml_lens[0]));
+
+        // col_ids_file.write(reinterpret_cast<char*>(&process.st_length), sizeof(process.st_length));
+        // col_ids_file.write(reinterpret_cast<char*>(&process.read_name[0]), process.st_length);
+        // auto& col_ids = process.mq.get_col_ids();
+        // uint64_t col_ids_size = col_ids.size();
+        // col_ids_file.write(reinterpret_cast<char*>(&col_ids_size), sizeof(col_ids_size));
+        // col_ids_file.write(reinterpret_cast<char*>(&col_ids[0]), col_ids_size * sizeof(col_ids[0]));
         #else
         mls_file.write(reinterpret_cast<char*>(&process.st_length), sizeof(process.st_length));
         mls_file.write(reinterpret_cast<char*>(&process.read_name[0]), process.st_length);

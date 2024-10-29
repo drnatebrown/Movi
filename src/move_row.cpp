@@ -46,7 +46,7 @@ void MoveRow::set_overflow_thresholds() {
 #endif
 
 void MoveRow::set_n(uint16_t n_) {
-#if MODE == 0 or MODE == 1 or MODE == 2 or MODE == 4
+#if MODE == 0 or MODE == 1 or MODE == 2
     n = n_;
 #endif
 #if MODE == 3
@@ -56,6 +56,19 @@ void MoveRow::set_n(uint16_t n_) {
     else {
         std::cerr << "The length is greater than 2^12: " << n_ << "\n";
         exit(0);
+    }
+#endif
+#if MODE == 4
+    if (is_col_run()) {
+        n = n & mask_n;
+        if (n_ < 2^8)
+            n = n | n_;
+        else {
+            std::cerr << "The col-run length is greater than 2^8: " << n_ << "\n";
+            exit(0);
+        }
+    } else {
+        n = n_;
     }
 #endif
 }
@@ -125,11 +138,15 @@ void MoveRow::set_c(char c_, std::vector<uint64_t>& alphamap) {
 #if MODE == 4
 void MoveRow::set_is_col_run() {
     overflow_bits = overflow_bits & mask_is_col_run;
-    overflow_bits = overflow_bits | (1 >> 7);
+    overflow_bits = overflow_bits | (1 >> 6);
 }
 
 void MoveRow::set_col(uint8_t col_) {
-    set_is_col_run();
-    n = col_;
+    if (!is_col_run()) {
+        set_is_col_run();
+        set_n(n);
+    } 
+    n = n & mask_cid;
+    n = n | col_;
 }
 #endif
