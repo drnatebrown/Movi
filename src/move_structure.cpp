@@ -596,7 +596,7 @@ void MoveStructure::build() {
         std::cerr << "bits.size after loading the d_col file: " << bits.size() << "\n";
         std::cerr << "The main bit vector (bits) is loaded from the d_col file.\n";
         #elif MODE == 4
-        std::string splitting_filename = movi_options->get_ref_file() + std::string(".col_runs.bv");
+        std::string splitting_filename = movi_options->get_ref_file() + std::string(".col_runs");
         std::ifstream splitting_file(splitting_filename);
 
         bits.load(splitting_file);
