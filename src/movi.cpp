@@ -240,8 +240,8 @@ void query(MoveStructure& mv_, MoviOptions& movi_options) {
         if (movi_options.get_ftab_k() == 0) {
             throw std::runtime_error(ERROR_MSG("MEM finding requires ftab. Please build the ftab using the ./movi ftab --ftab-k <k>, then pass --ftab-k <k> to the query step."));
         } else {
-            if (movi_options.get_min_mem_length() > movi_options.get_ftab_k()) {
-                WARNING_MSG("Setting minimum MEM (length " + std::to_string(movi_options.get_min_mem_length()) + ") greater than ftab k (" + std::to_string(movi_options.get_ftab_k()) + ") causes a slower MEM search.");
+            if (movi_options.get_min_mem_length() < movi_options.get_ftab_k()) {
+                WARNING_MSG("Setting minimum MEM (length " + std::to_string(movi_options.get_min_mem_length()) + ") less than ftab k (" + std::to_string(movi_options.get_ftab_k()) + ") may cause a slower MEM search.");
             }
         }
     }

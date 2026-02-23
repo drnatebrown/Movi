@@ -306,11 +306,11 @@ void print_query_stats(MoviOptions& movi_options, uint64_t total_ff_count, MoveS
 void output_mems(bool to_stdout, std::ofstream& mems_file, MoveQuery& mq) {
     if (to_stdout) {
         for (auto& mem : mq.get_mems()) {
-            std::cout << mq.get_query_id() << "\t" << mem.start << "\t" << mem.end << "\t" << mem.count << "\n";
+            std::cout << mq.get_query_id() << "\t" << mem.start << "\t" << mem.end << "\t" << mem.count << "\t" << mem.tag << "\n";
         }
     } else {
         for (auto& mem : mq.get_mems()) {
-            mems_file << mq.get_query_id() << "\t" << mem.start << "\t" << mem.end << "\t" << mem.count << "\n";
+            mems_file << mq.get_query_id() << "\t" << mem.start << "\t" << mem.end << "\t" << mem.count << "\t" << mem.tag << "\n";
         }
     }
 }

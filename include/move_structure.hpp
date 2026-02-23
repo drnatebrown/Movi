@@ -35,6 +35,7 @@
 #include "utils.hpp"
 #include "move_intervals.hpp"
 #include "doc_set.hpp"
+#include "tagger.hpp"
 
 class Classifier;
 
@@ -69,6 +70,7 @@ class MoveStructure {
 
         uint64_t LF(uint64_t row_number, uint64_t alphabet_index);
         uint64_t LF_heads(uint64_t run_number, uint64_t alphabet_index);
+        uint64_t to_bwt_position(uint64_t idx, uint64_t offset);
         // The 3rd argument of LF_move is used in the latency_hiding_tally mode
         uint16_t LF_move(uint64_t& pointer, uint64_t& i, uint64_t id = std::numeric_limits<uint64_t>::max());
         uint64_t fast_forward(uint64_t& offset, uint64_t index, uint64_t x);
@@ -112,6 +114,7 @@ class MoveStructure {
         void add_detected_run(uint64_t scanned_bwt_length, uint64_t run_char, uint16_t& run_length);
         void find_run_heads_information();
         void build_move_rows();
+        void build_runs_bv();
         void find_base_interval_data();
         void build_alphabet(std::vector<uint64_t>& all_possible_chars);
 
@@ -196,6 +199,7 @@ class MoveStructure {
         void set_classifier(Classifier *cl) { classifier = cl; }
         void set_output_files(OutputFiles *of) { output_files = of; }
 
+
         // Document tree functions
         bool is_ancestor(uint16_t x, uint16_t y);
         uint16_t LCA(uint16_t x, uint16_t y);
@@ -238,6 +242,9 @@ class MoveStructure {
         void read_counts_data(std::ifstream& fin);
         void write_main_table(std::ofstream& fout);
         void read_main_table(std::ifstream& fin, std::streamoff rlbwt_offset);
+        void write_runs_bv(std::ofstream& fout);
+        void read_runs_bv(std::ifstream& fin);
+        void read_tagger();
         void write_separators_thresholds(std::ofstream& fout);
         void read_separators_thresholds(std::ifstream& fin);
         void serialize();
@@ -367,6 +374,10 @@ class MoveStructure {
         std::vector<std::vector<uint32_t>> id_blocks;
         uint64_t block_size = BLOCK_SIZE;
 #endif
+        sdsl::sd_vector<> runs_bv;
+        sdsl::sd_vector<>::select_1_type runs_bv_select;
+
+        Tagger tagger;
 
         // auxilary datastructures for the length, offset and thresholds overflow
         std::vector<uint64_t> n_overflow;

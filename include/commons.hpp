@@ -60,7 +60,7 @@ inline std::string format_number_with_commas(uint64_t number) {
     return result;
 }
 
-#define SEPARATOR '%'
+#define SEPARATOR '#'
 #define SEPARATOR_INDEX 0
 
 // Progress bar utility function

@@ -2,7 +2,7 @@
 
 void MoveStructure::compute_number_of_build_steps() {
     current_build_step = 1;
-    total_build_steps = 4;
+    total_build_steps = 5;
 #if USE_THRESHOLDS
     total_build_steps += 1;
 #endif
@@ -54,6 +54,7 @@ void MoveStructure::build() {
     }
 
     build_move_rows();
+    build_runs_bv();
 
 #if USE_THRESHOLDS
     // compute the thresholds
@@ -689,6 +690,23 @@ void MoveStructure::build_move_rows() {
 #if BLOCKED_MODES
     compute_blocked_ids(raw_ids);
 #endif
+}
+
+void MoveStructure::build_runs_bv() {
+    sdsl::sd_vector_builder builder(length, rlbwt.size());
+
+    size_t current_run_start = 0;
+    for (size_t i = 0; i < rlbwt.size(); ++i) {
+        if (i % 1000000 == 0 or i == rlbwt.size() - 1) {
+            print_progress_bar(i, rlbwt.size() - 1, "Building the runs BV", current_build_step, total_build_steps);
+        }
+        builder.set(current_run_start);
+        current_run_start += rlbwt[i].get_n();
+    }
+    runs_bv = sdsl::sd_vector<>(builder);
+    runs_bv_select = sdsl::sd_vector<>::select_1_type(&runs_bv);
+    PROGRESS_MSG("Successfully built the runs BV of length " + runs_bv.size() + " with " + std::to_string(rlbwt.size()) + " runs");
+    current_build_step++;
 }
 
 void MoveStructure::find_base_interval_data() {

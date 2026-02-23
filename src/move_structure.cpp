@@ -511,6 +511,10 @@ uint64_t MoveStructure::LF(uint64_t row_number, uint64_t alphabet_index) {
     return lf;
 }
 
+uint64_t MoveStructure::to_bwt_position(uint64_t idx, uint64_t offset) {
+    return runs_bv_select(idx + 1) + offset;
+}
+
 uint64_t MoveStructure::LF_heads(uint64_t run_number, uint64_t alphabet_index) {
     uint64_t lf = 0;
     lf += 1;

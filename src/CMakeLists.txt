@@ -25,6 +25,7 @@ set(MOVI_SOURCES
     classifier.cpp
     batch_loader.cpp
     commons.cpp
+    tagger.cpp
 )
 
 set(MOVI_MAIN_SOURCES

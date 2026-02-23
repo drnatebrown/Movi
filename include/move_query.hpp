@@ -43,9 +43,10 @@ class MoveQuery {
             uint32_t start;
             uint32_t end;
             uint16_t count;
+            uint16_t tag;
         };
-        void add_mem(uint32_t start, uint32_t end, uint16_t count) {
-            mems.push_back(mem_t(start, end, count));
+        void add_mem(uint32_t start, uint32_t end, uint16_t count, uint16_t tag) {
+            mems.push_back(mem_t(start, end, count, tag));
         }
 
         void add_cost(std::chrono::nanoseconds cost) { costs.push_back(cost); }

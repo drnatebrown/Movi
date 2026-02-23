@@ -78,7 +78,10 @@ bool MoveStructure::query_mem_bml(MoveQuery& mq, int32_t& pos_on_r, int32_t& min
         ++match_len;
     }
 
-    mq.add_mem(pos_on_r, i, rc_interval.count(rlbwt));
+    uint64_t bwt_start = to_bwt_position(rc_interval.run_start, rc_interval.offset_start);
+    uint64_t bwt_end = to_bwt_position(rc_interval.run_end, rc_interval.offset_end);
+    uint16_t tag = tagger.get_tag(bwt_start, bwt_end);
+    mq.add_mem(pos_on_r, i, bwt_end - bwt_start + 1, tag);
 
     // Backward extension to find next left end of candidate MEM (inclusive)
     // TODO: if this extension is at least L, we can skip the first BML step in next recursion
@@ -125,7 +128,10 @@ uint64_t MoveStructure::query_all_mems(MoveQuery& mq) {
             ++match_len;
         }
         e = s + match_len;
-        mq.add_mem(s, e, bi_interval_before_extension.fw_interval.count(rlbwt));
+        uint64_t bwt_start = to_bwt_position(bi_interval_before_extension.fw_interval.run_start, bi_interval_before_extension.fw_interval.offset_start);
+        uint64_t bwt_end = to_bwt_position(bi_interval_before_extension.fw_interval.run_end, bi_interval_before_extension.fw_interval.offset_end);
+        uint16_t tag = tagger.get_tag(bwt_start, bwt_end);
+        mq.add_mem(s, e, bwt_end - bwt_start + 1, tag);
 
         // Backward extension to find next MEM start
         match_len = 0;

@@ -39,6 +39,22 @@ std::ifstream MoveStructure::open_index_read() {
     return fin;
 }
 
+void MoveStructure::write_runs_bv(std::ofstream& fout) {
+    runs_bv.serialize(fout);
+}
+
+void MoveStructure::read_runs_bv(std::ifstream& fin) {
+    runs_bv.load(fin);
+    runs_bv_select = sdsl::sd_vector<>::select_1_type(&runs_bv);
+    std::cout << "Loaded runs BV with " << runs_bv.size() << " bits" << std::endl;
+}
+
+void MoveStructure::read_tagger() {
+    std::string fname = movi_options->get_index_dir() + "/index";
+    tagger.load(fname);
+    std::cout << "Loaded tagger BV with " << tagger.size() << " bits and " << tagger.tag_heads_size() << " heads" << std::endl;
+}
+
 void MoveStructure::write_index_header(std::ofstream& fout) {
     if (!movi_options->is_no_header()) {
         if (movi_options->is_legacy_header()) {
@@ -441,6 +457,8 @@ void MoveStructure::serialize() {
 
     write_main_table(fout);
 
+    write_runs_bv(fout);
+
 #if TALLY_MODES
     write_tally_table(fout);
 #endif
@@ -479,6 +497,8 @@ void MoveStructure::deserialize() {
     std::streamoff rlbwt_offset = fin.tellg();
     read_main_table(fin, rlbwt_offset);
 
+    read_runs_bv(fin);
+
 #if TALLY_MODES
     read_tally_table(fin);
 #endif
@@ -506,6 +526,8 @@ void MoveStructure::deserialize() {
         read_separators_thresholds(fin);
     }
 #endif
+
+    read_tagger();
 
     fin.close();
 }
