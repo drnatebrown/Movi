@@ -705,7 +705,7 @@ void MoveStructure::build_runs_bv() {
     }
     runs_bv = sdsl::sd_vector<>(builder);
     runs_bv_select = sdsl::sd_vector<>::select_1_type(&runs_bv);
-    PROGRESS_MSG("Successfully built the runs BV of length " + runs_bv.size() + " with " + std::to_string(rlbwt.size()) + " runs");
+    PROGRESS_MSG("Successfully built the runs BV of length " + std::to_string(runs_bv.size()) + " with " + std::to_string(rlbwt.size()) + " runs");
     current_build_step++;
 }
 

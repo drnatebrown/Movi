@@ -1,7 +1,7 @@
 # release
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 # debug:
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -O0")
 
 # compile with address sanitizer
 # add_compile_options(-fsanitize=address)
@@ -51,6 +51,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_executable(movi-prepare-ref prepare_ref.cpp commons.cpp)
 target_link_libraries(movi-prepare-ref zlibstatic)
+
+add_executable(tagger-consensus consensus.cpp)
+target_link_libraries(tagger-consensus PRIVATE pthread zlibstatic)
 
 add_executable(movi-large ${MOVI_MAIN_SOURCES})
 target_link_libraries(movi-large sdsl zlibstatic OpenMP::OpenMP_CXX hclust)

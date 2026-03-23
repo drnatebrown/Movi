@@ -237,12 +237,16 @@ void MoveStructure::read_overflow_tables(std::ifstream& fin) {
     uint64_t n_overflow_size;
     fin.read(reinterpret_cast<char*>(&n_overflow_size), sizeof(n_overflow_size));
     n_overflow.resize(n_overflow_size);
-    fin.read(reinterpret_cast<char*>(&n_overflow[0]), n_overflow_size*sizeof(uint64_t));
+    if (n_overflow.size() > 0) {
+        fin.read(reinterpret_cast<char*>(&n_overflow[0]), n_overflow_size*sizeof(uint64_t));
+    }
 
     uint64_t offset_overflow_size;
     fin.read(reinterpret_cast<char*>(&offset_overflow_size), sizeof(offset_overflow_size));
     offset_overflow.resize(offset_overflow_size);
-    fin.read(reinterpret_cast<char*>(&offset_overflow[0]), offset_overflow_size*sizeof(uint64_t));
+    if (offset_overflow.size() > 0) {
+        fin.read(reinterpret_cast<char*>(&offset_overflow[0]), offset_overflow_size*sizeof(uint64_t));
+    }
 
     uint64_t thresholds_overflow_size;
     fin.read(reinterpret_cast<char*>(&thresholds_overflow_size), sizeof(thresholds_overflow_size));

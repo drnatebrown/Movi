@@ -286,6 +286,10 @@ uint64_t MoveStructure::get_id(uint64_t idx) {
 }
 
 char MoveStructure::get_char(uint64_t idx) {
+    if (idx >= rlbwt.size()) {
+        throw std::runtime_error("get_char: idx out of bounds: " + std::to_string(idx) +
+                                 " >= " + std::to_string(rlbwt.size()));
+    }
     if (idx == end_bwt_idx)
         return '$';
     else
